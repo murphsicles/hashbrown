@@ -1,0 +1,43 @@
+// Auto-converted from /tmp/df-hashbrown-0.17.1/hashbrown-0.17.1/src/scopeguard.rs
+
+use core::{ mem::ManuallyDrop, ops::{ Deref, DerefMut }, ptr };
+struct ScopeGuard<T, F> {
+ dropfn: F,
+ value: T,
+}
+
+#[inline]
+fn guard<T, F>(value: T, dropfn: F) -> ScopeGuard<T, F> where F: FnMut {
+ ScopeGuard { dropfn, value }
+}
+
+impl<T, F> ScopeGuard<T, F> where F: FnMut {
+ fn into_inner(guard: Self) -> T {
+ let guard = ManuallyDrop::new(guard);
+ unsafe { let value = ptr::read(&raw const guard.value); let _ = ptr::read(&raw const guard.dropfn); value }
+ }
+ 
+}
+
+impl<T, F> Deref for ScopeGuard<T, F> where F: FnMut {
+ type Target = T;
+ fn deref(&self) -> &T {
+ &self.value
+ }
+ 
+}
+
+impl<T, F> DerefMut for ScopeGuard<T, F> where F: FnMut {
+ fn deref_mut(&mut self) -> &mut T {
+ &mut self.value
+ }
+ 
+}
+
+impl<T, F> Drop for ScopeGuard<T, F> where F: FnMut {
+ fn drop(&mut self) {
+ (self.dropfn)(&mut self.value);
+ }
+ 
+}
+

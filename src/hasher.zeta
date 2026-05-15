@@ -1,0 +1,41 @@
+// Auto-converted from /tmp/df-hashbrown-0.17.1/hashbrown-0.17.1/src/hasher.rs
+
+#[cfg(feature = "default-hasher")] use { core::hash::{ BuildHasher, Hasher }, foldhash::fast::RandomState };
+/// Default hash builder for the `S` type parameter of
+/// [`HashMap`](crate::HashMap) and [`HashSet`](crate::HashSet).
+/// 
+/// This only implements `BuildHasher` when the "default-hasher" crate feature
+/// is enabled; otherwise it just serves as a placeholder, and a custom `S` type
+/// must be used to have a fully functional `HashMap` or `HashSet`.
+#[derive(Clone, Debug, Default)]
+pub struct DefaultHashBuilder {
+ inner: RandomState,
+}
+
+#[cfg(feature = "default-hasher")]
+impl BuildHasher for DefaultHashBuilder {
+ type Hasher = DefaultHasher;
+ fn build_hasher(&self) -> Self::Hasher {
+ DefaultHasher { inner: self.inner.build_hasher() }
+ }
+ 
+}
+
+/// Default hasher for [`HashMap`](crate::HashMap) and [`HashSet`](crate::HashSet).
+#[cfg(feature = "default-hasher")]
+#[derive(Clone)]
+pub struct DefaultHasher {
+ inner: BuildHasher::Hasher,
+}
+
+#[cfg(feature = "default-hasher")] macro_rules ! forward_writes { ($ ($ write: ident($ ty: ty) ) *) => { $ (#[inline(always)] fn $ write(&mut self, arg: $ ty) { self.inner .$ write(arg); }) * } }
+#[cfg(feature = "default-hasher")]
+impl Hasher for DefaultHasher {
+ // [unsupported impl item]
+ // [unsupported impl item]
+ fn finish(&self) -> u64 {
+ self.inner.finish()
+ }
+ 
+}
+

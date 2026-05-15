@@ -1,0 +1,26 @@
+// Auto-converted from /tmp/df-hashbrown-0.17.1/hashbrown-0.17.1/src/util.rs
+
+#[cfg(feature = "nightly")] pub(crate) use core::intrinsics::{ likely, unlikely };
+#[cfg(not(feature = "nightly"))]
+#[inline(always)]
+#[cold]
+fn cold_path() {
+}
+
+#[cfg(not(feature = "nightly"))]
+#[inline(always)]
+fn likely(b: bool) -> bool {
+ if b { true } else { cold_path(); false }
+}
+
+#[cfg(not(feature = "nightly"))]
+#[inline(always)]
+fn unlikely(b: bool) -> bool {
+ if b { cold_path(); true } else { false }
+}
+
+#[inline(always)]
+fn invalid_mut<T>(addr: usize) -> *mut T {
+ unsafe { core::mem::transmute(addr) }
+}
+
